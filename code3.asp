@@ -16,9 +16,8 @@
  	time(id,-1..1).
  	time(ind,-1..1).
 
-% evolution profile of EI > 0 with discontinuity of at least disc  
-% units between -1 and 0 then rise of at least one unit without 
-% reaching its basal value
+% evolution profile of EI > 0 with discontinuity of at least disc units between  
+% -1 and 0 then rise of at least one unit without reaching its basal value
  	1 { v(Ph,T,ei,1..m) } 1 :- time(Ph,T).
  	V2 <= V1-disc :- v(Ph,-1,ei,V1); v(Ph,0,ei,V2).
  	V3 > V2 :- v(Ph,0,ei,V2); v(Ph,1,ei,V3).
@@ -41,7 +40,7 @@
  	V2 >= V1-1   :- v(Ph,-1,ee,V1); v(Ph,0,ee,V2).
  	V1 > V3 :- v(Ph,-1,ee,V1); v(Ph,1,ee,V3).
 % evolution profile of P >= 0, null in -1, with discontinuity 
-% of at least disc units between -1 and 0 
+% of at least disc units between -1 and 0, then constant 
  	v(Ph,-1,p,0) :- time(Ph,-1).
  	v(Ph,T,p,V) :- time(Ph,T); T >= 0; val(p,Ph,V).
  	1 { val(p,Ph, disc..m) } 1 :- time(Ph,_).
@@ -51,25 +50,21 @@
 
 % the three core phenomena
 % Ph.1: non-initiation (ni)
-  	:- deltaep(G); 
-   not #sum { W,I,0: eff(ni,0,I,W); -W,I,-1: eff(ni,-1,I,W) } -G.
+  	:- deltaep(G); not #sum { W,I,0: eff(ni,0,I,W); -W,I,-1: eff(ni,-1,I,W) } -G.
 % Ph.2: initiation followed by discontinuation (id)
-  	:- deltaem(G); 
-   not 1-G #sum { W,I,0: eff(id,0,I,W); -W,I,-1: eff(id,-1,I,W)}.
-  	:- deltaep(G); 
-   not #sum { W,I,1 : eff(id,1,I,W); -W,I,-1: eff(id,-1,I,W)} -G.
+  	:- deltaem(G); not 1-G #sum { W,I,0: eff(id,0,I,W); -W,I,-1: eff(id,-1,I,W)}.
+  	:- deltaep(G); not #sum { W,I,1 : eff(id,1,I,W); -W,I,-1: eff(id,-1,I,W)} -G.
 % Ph.3: initiation followed by non-discontinuation (ind)
-  	:- deltaem(G); 
-   not 1-G #sum { W,I,0: eff(ind,0,I,W); -W,I,-1: eff(ind,-1,I,W)}.
- 	:- deltaem(G); 
-   not 1-G #sum { W,I,1: eff(ind,1,I,W); -W,I,-1: eff(ind,-1,I,W)}.
+  	:- deltaem(G); not 1-G #sum { W,I,0: eff(ind,0,I,W); -W,I,-1: eff(ind,-1,I,W)}.
+ 	:- deltaem(G); not 1-G #sum { W,I,1: eff(ind,1,I,W); -W,I,-1: eff(ind,-1,I,W)}.
 % the global causal effect on E at -1 is greater than deltaep
- 	:- time(Ph,_); deltaep(G); 
-   not G+1 #sum { W,I: eff(Ph,-1,I,W) }.
+ 	:- time(Ph,_); deltaep(G); not G+1 #sum { W,I: eff(Ph,-1,I,W) }.
 
 % restoration at 1 of the basal value of E
-  	:- not  
-   #sum { W,I,1: eff(ind,1,I,W); -W,I,1: eff(ind,-1,I,W)} = 0.
+  	:- not #sum { W,I,1: eff(ind,1,I,W); -W,I,1: eff(ind,-1,I,W)} = 0.
 
-% minimality: at most three active causalities
+% minimality: at most three active causalities (change 2 by 3 if restoration disabled)
  	:- not 2 #count { I : csgn(I,0) }.
+
+% display of the signs of the causalities
+ 	#show csgn/2.
